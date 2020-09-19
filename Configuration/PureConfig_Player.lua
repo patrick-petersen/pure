@@ -39,6 +39,24 @@ local actionRed, actionGreen, actionBlue
 local moraleRed, moraleGreen, moraleBlue
 local rvrRed, rvrGreen, rvrBlue
 
+
+   
+local effectTracker		= {}
+effectTracker[1]	= { config=0, 		locale=T["All"] }
+effectTracker[2]	= { config=1, 	locale=T["Buffs"] }
+effectTracker[3]	= { config=2, 		locale=T["Debuffs"] }
+
+
+
+effectTrackerLookup	= {}
+for k,v in ipairs( effectTracker )
+do
+	effectTrackerLookup[v.config] = k
+end
+
+
+
+
 local window	= {
 	Name		= T["Player"],
 	display		= {},
@@ -60,7 +78,7 @@ function InitializeWindow()
 	
 	-- Effect Window
 	w = LibGUI( "window", nil, "PureWindowDefault" )
-    w:Resize( 400, 650 )
+    w:Resize( 400, 700 )
 	w:Show( true )
 	window.W.Effects = w
 	
@@ -373,10 +391,32 @@ function InitializeWindow()
     e:SetText( T["Show Mythic Style Border"] )
     window.W.Effects.ShowMythicStyleBorder_Label = e
     
+	-- Track Effects
+    e = window.W.Effects( "Label" )
+    e:Resize( 300 )
+    e:AnchorTo( window.W.Effects.ShowMythicStyleBorder_Checkbox, "bottomleft", "topleft", 0, 5 )
+    e:Font( "font_chat_text" )
+    e:Align( "leftcenter" )
+    e:SetText( T["Track Effects:"] )
+    window.W.Effects.Track = e
+    
+    -- Trackable Effects
+    e = window.W.Effects( "Combobox" )
+    e:AnchorTo( window.W.Effects.Track, "bottomleft", "topleft", 0, 0 )
+ 
+    for _, anchor in ipairs( effectTracker ) 
+	do 
+		e:Add( anchor.locale )
+	end
+    window.W.Effects.Trackable = e
+
+
+
+
     -- Effects - Effect Rows Label
     e = window.W.Effects( "Label" )
     e:Resize( 300 )
-    e:AnchorTo( window.W.Effects.ShowMythicStyleBorder_Checkbox, "bottomleft", "topleft", 0, 10 )
+    e:AnchorTo( window.W.Effects.Trackable, "bottomleft", "topleft", 0, 10 )
     e:Font( "font_chat_text" )
     e:Align( "leftcenter" )
     e:SetText( T["Effect Rows:"] )
@@ -486,7 +526,7 @@ function InitializeWindow()
     e = window.W.Effects( "Label" )
     e:Resize( 450 )
     e:Align( "center" )
-    e:AnchorTo( window.W.Effects, "top", "top", 0, 440 )
+    e:AnchorTo( window.W.Effects, "top", "top", 0, 500 )
     e:Font( "font_chat_text" )
     e:SetText( T["Effect Frame Alpha"] )
     window.W.Effects.EffectFrameAlpha_Label = e
@@ -1211,6 +1251,7 @@ function ApplyConfigSettings()
 	Pure.Set( "player-effects-showlabels", window.W.Effects.ShowEffectLabels_Checkbox:GetValue() )
 	Pure.Set( "player-effects-selfcastonly", window.W.Effects.ShowSelfCastEffectsOnly_Checkbox:GetValue() )
 	Pure.Set( "player-effects-mythicborder", window.W.Effects.ShowMythicStyleBorder_Checkbox:GetValue() )
+	Pure.Set( "player-effects-trackable", effectTracker[window.W.Effects.Trackable:SelectedIndex()].config )
 	Pure.Set( "player-effects-rows", tonumber( window.W.Effects.EffectRows_Textbox:GetText() ) or Pure.GetDefault( "player-effects-rows" ) )
 	Pure.Set( "player-effects-cols", tonumber( window.W.Effects.EffectColumns_Textbox:GetText() ) or Pure.GetDefault( "player-effects-cols" ) )
 	Pure.Set( "player-effects-dx", tonumber( window.W.Effects.EffectWidth_Textbox:GetText() ) or Pure.GetDefault( "player-effects-dx" ) )
@@ -1283,6 +1324,7 @@ function RevertConfigSettings()
 	window.W.Effects.ShowEffectLabels_Checkbox:SetValue( Pure.Get( "player-effects-showlabels" ) )
 	window.W.Effects.ShowSelfCastEffectsOnly_Checkbox:SetValue( Pure.Get( "player-effects-selfcastonly" ) )
 	window.W.Effects.ShowMythicStyleBorder_Checkbox:SetValue( Pure.Get( "player-effects-mythicborder" ) )
+	window.W.Effects.Trackable:SelectIndex( effectTrackerLookup[Pure.Get( "player-effects-trackable" )] )
 	window.W.Effects.EffectRows_Textbox:SetText( towstring( Pure.Get( "player-effects-rows" ) ) )
 	window.W.Effects.EffectColumns_Textbox:SetText( towstring( Pure.Get( "player-effects-cols" ) ) )
 	window.W.Effects.EffectWidth_Textbox:SetText( towstring( Pure.Get( "player-effects-dx" ) ) )

@@ -80,10 +80,11 @@ function PurePlayerUnitFrame:InitializeEffectTracker()
 		local effectsFontAlpha	= Pure.Get( "player-effects-font-alpha" )
 		local effectsMBorder	= Pure.Get( "player-effects-mythicborder" )
 		local handleInput		= Pure.Get( "player-frame-handleinput" )
+		local trackerType		= Pure.Get( "player-effects-trackable" )
 		
 		-- Create our tracker
 		self.m_effectTracker = PureEffectTracker:Create( self.m_EffectWindowId, "Root", GameData.BuffTargetType.SELF, 
-			PureEffectTracker.trackerType.ALL, totalRows, totalCols, initialAnchor, rowOffset, colOffset, location )
+			trackerType, totalRows, totalCols, initialAnchor, rowOffset, colOffset, location )
 		self.m_effectTracker:Initialize( dx, dy, effectsAlpha, effectsFontAlpha, 10, effectsAlpha / 2, selfCastOnly, showLabels, true, effectsMBorder, handleInput )
 	end
 end

@@ -39,6 +39,7 @@ Pure.DefaultSettings 	=
 		["friendly-effects-alpha"]					= 1.0,
 		["friendly-effects-anchor"]					= "top",						-- "top", "bottom", "left", "right"
 		["friendly-effects-mythicborder"]			= false,
+		["player-effects-trackable"]				= 0,
 		["friendly-effects-cols"]					= 8,
 		["friendly-effects-col-offset"]				= 2,
 		["friendly-effects-dx"]						= 28,

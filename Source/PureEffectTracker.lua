@@ -26,6 +26,46 @@ local function IsValidEffect( effectData )
     return ( effectData ~= nil and effectData.effectIndex ~= nil and effectData.iconNum ~= nil and effectData.iconNum > 0 )
 end
 
+local function IsTrackedEffect( effectData , effectTrackerType)
+    -- Categories and the attributes that belong to them (probably)
+    --Buff
+    --isStatBuff
+    --isOffensive
+    --isDefensive
+    --isBuff
+    --isBlessing
+    --isHealing
+
+    --DEBUFF
+    --isDebuff
+    --isDamaging
+    --isHex
+    --isAilment
+    --isCurse
+
+    --UNKNOWN
+    --isGranted
+    --isPassive
+    
+    local function isBuff(effectData)
+        return effectData.isStatBuff or effectData.isOffensive or effectData.isDefensive or effectData.isBuff or effectData.isBlessing or effectData.isHealing
+    end
+
+    local function isUnknown(effectData)
+        return effectData.isGranted or effectData.isPassive
+    end
+
+    if effectTrackerType == PureEffectTracker.trackerType.ALL then
+        return true
+    elseif effectTrackerType == PureEffectTracker.trackerType.BUFF then
+        return isBuff(effectData) or isUnknown(effectData)
+    elseif effectTrackerType == PureEffectTracker.trackerType.DEBUFF then
+        return not isBuff(effectData)
+    else 
+        return true
+    end
+end
+
 local function CopyTable( source )
 	local newTable = {}
 	for k, v in pairs (source) 
@@ -307,7 +347,7 @@ function PureEffectTracker:Update( elapsedTime )
 	if( lastUpdate > nextUpdate ) then
 		for effectId, effect in pairs( self.m_effectData )
 	    do
-	        if( IsValidEffect( effect ) ) then
+	        if( IsValidEffect( effect ) ) and IsTrackedEffect(effect, self.m_effectTrackerType) then
 	            if( effect.duration >= elapsedTime ) then
 	                effect.duration = effect.duration - lastUpdate
 	            else
@@ -341,7 +381,7 @@ function PureEffectTracker:UpdateEffects( effects, isFullList )
 
 	for effectId, effect in pairs( effects )
     do
-        if( IsValidEffect( effect ) ) then
+        if( IsValidEffect( effect ) and IsTrackedEffect(effect, self.m_effectTrackerType) ) then
         	if( not self.m_bShowSelfCastOnly or ( ( effect.castByPlayer and self.m_bShowSelfCastOnly ) or ( selfCastExclusions[effectId] ~= nil ) ) ) then
         		self.m_effectData[effectId] = CopyTable( effect )
         		self.m_effectData[effectId].m_maxDuration = self.m_effectData[effectId].duration
